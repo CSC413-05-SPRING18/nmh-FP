@@ -6,7 +6,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-
 import com.google.android.gms.common.SignInButton;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -16,7 +15,6 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,24 +36,28 @@ public class VoteActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_vote);
 
-
-        //assign fields
+        //Initializing our vote buttons
         song1Button = (Button) findViewById(R.id.song1Vote);
         song2Button = (Button) findViewById(R.id.song2Vote);
         song3Button = (Button) findViewById(R.id.song3Vote);
         song1name = (EditText) findViewById(R.id.song1name);
         song2name = (EditText) findViewById(R.id.song2name);
         song3name = (EditText) findViewById(R.id.song3name);
+
+        //Adding an event listener to our database reference
         songRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            //Allowing ourselves to get updated information via the database snapshot
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String key = "";
                 String song1 = "",song2 = "",song3 = "";
                 for (DataSnapshot songSnap : dataSnapshot.getChildren()) {
                     key = songSnap.getKey();
+                    //Getting the song names
                     song1 = songSnap.child("song1").getValue(String.class);
                     song2 = songSnap.child("song2").getValue(String.class);
                     song3 = songSnap.child("song3").getValue(String.class);
+                    //Setting the song names
                     song1name.setText(song1);
                     song2name.setText(song2);
                     song3name.setText(song3);
@@ -71,7 +73,6 @@ public class VoteActivity extends AppCompatActivity {
 
 
         // set click listeners
-
         song1Button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -81,7 +82,7 @@ public class VoteActivity extends AppCompatActivity {
         song2Button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-            vote2(songRef);
+                vote2(songRef);
             }
         });
         song3Button.setOnClickListener(new View.OnClickListener() {
@@ -93,14 +94,18 @@ public class VoteActivity extends AppCompatActivity {
 
     }
 
+    //Check to see if voted
     public static void voted() {
         voted = true;
     }
 
+    //Check to see if refreshed vote
     public static void refreshVote() {
         voted = false;
     }
 
+    //Checking to see if we have voted
+    //so that we can't vote more than once
     public void voteCheck()
     {
         if (voted = true) {
@@ -117,6 +122,13 @@ public class VoteActivity extends AppCompatActivity {
 
     }
 
+
+    //For each song we need to be able to grab updated information
+    //about the individual song's votes, so we did that here
+    //for each song's vote count.
+
+
+    //Update for votes on song 1
     private void vote1(final DatabaseReference songRef) {
         songRef.addListenerForSingleValueEvent(new ValueEventListener() {
             String key = "";
@@ -141,6 +153,8 @@ public class VoteActivity extends AppCompatActivity {
         });
     }
 
+
+    //Update for votes on song 2
     private void vote2(final DatabaseReference songRef) {
         songRef.addListenerForSingleValueEvent(new ValueEventListener() {
             String key = "";
@@ -165,6 +179,8 @@ public class VoteActivity extends AppCompatActivity {
         });
     }
 
+
+    //Update for votes on song 3
     private void vote3(final DatabaseReference songRef) {
         songRef.addListenerForSingleValueEvent(new ValueEventListener() {
             String key = "";
@@ -191,30 +207,4 @@ public class VoteActivity extends AppCompatActivity {
 
 
 
-
-
-
-//        ValueEventListener eventSongListener = new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//                List<String> list = new ArrayList<>();
-//                for(DataSnapshot songSnap : dataSnapshot.getChildren()) {
-//
-//                    String userId = songSnap.getKey();
-//
-//                    list.add(userId);
-//                    sFirebaseDatabaseReference.child(SONGS_CHILD).child(songSnap.getKey().toString()).child("song1count").setValue(1);
-//                    System.out.println("WORLDD");
-//                    System.out.println(songSnap.getKey().toString());
-//                }
-//                Log.d("SONGS", list.toString());
-////            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {}
-//        };
-
-    }
-
-
-
+}

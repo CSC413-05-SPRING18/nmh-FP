@@ -15,7 +15,7 @@ public class RoleChoice extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_role_choice);
 
-        // Assign fields
+        // Initialize buttons
         djButton = (Button)findViewById(R.id.djButton);
         viewerButton = (Button)findViewById(R.id.viewerButton);
 
@@ -34,12 +34,15 @@ public class RoleChoice extends AppCompatActivity {
             }
         });
     }
+
+    //Allow DJ to be assigned
     private void assignDj() {
         System.out.println("DJ Button");
         startActivity(new Intent(RoleChoice.this, MainActivity.class));
         finish();
     }
 
+    //Allow Viewer to be assigned
     private void assignViewer() {
         System.out.println("Viewer Button");
         startActivity(new Intent(RoleChoice.this, VoteActivity.class));

@@ -9,8 +9,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.InputFilter;
 import android.view.Menu;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -19,7 +17,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.common.ConnectionResult;
@@ -31,7 +28,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -99,24 +95,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 .addApi(Auth.GOOGLE_SIGN_IN_API)
                 .build();
 
-//        // Initialize RecyclerView.
-//        //mMessageRecyclerView = (RecyclerView) findViewById(R.id.messageRecyclerView);
-//        mLinearLayoutManager = new LinearLayoutManager(this);
-//        // Causes unwanted flickery effect
-//        mMessageRecyclerView.setItemAnimator(null);
-//        mLinearLayoutManager.setReverseLayout(false);
-//        mLinearLayoutManager.setStackFromEnd(true);
-//        mMessageRecyclerView.setLayoutManager(mLinearLayoutManager);
-//
-//        mFirebaseAdapter = MessageUtil.getFirebaseAdapter(this,
-//                this,  /* MessageLoadListener */
-//                mLinearLayoutManager,
-//                mMessageRecyclerView);
-//
-//
-//        mMessageRecyclerView.setAdapter(mFirebaseAdapter);
-
-        //mMessageEditText = (EditText) findViewById(R.id.messageEditText);
+        //Initializing our Buttons
         songOneEdit = (EditText) findViewById(R.id.songOneText);
         songTwoEdit = (EditText) findViewById(R.id.songTwoText);
         songThreeEdit = (EditText) findViewById(R.id.songThreeText);
@@ -128,6 +107,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         votecount3 = (TextView) findViewById(R.id.votecount3);
         nextSong = (Button) findViewById(R.id.nextSong);
 
+
+        //Setting up onclick listener event
         nextSong.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -171,46 +152,18 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             }
 
         });
-//        mMessageEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(MSG_LENGTH_LIMIT)});
-//
-//        mMessageEditText.addTextChangedListener(new TextWatcher() {
-//            @Override
-//            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-//            }
-//
-//            @Override
-//            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-//                if (charSequence.toString().trim().length() > 0) {
-//                    mSendButton.setEnabled(true);
-//                } else {
-//                    mSendButton.setEnabled(false);
-//                }
-//            }
-//
-//            @Override
-//            public void afterTextChanged(Editable editable) {
-//            }
-//        });
 
 
+        //Initializing the floating action button
         mSendButton = (FloatingActionButton) findViewById(R.id.sendButton);
         mSendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                // Send messages on click.
-//                mMessageRecyclerView.scrollToPosition(0);
-
-//                ChatMessage chatMessage = new
-//                        ChatMessage(mUser.getDisplayName(),
-//                        mUser.getEmail(),
-//                        mUser.getUid(),
-//                        mMessageEditText.getText().toString());
-//                send(chatMessage);
-
+                //Initializing the Vote object and adding our songs
                 Vote songs = new Vote (songOneEdit.getText().toString(), songTwoEdit.getText().toString(),songThreeEdit.getText().toString());
-
                 addSong(songs);
-//                mMessageEditText.setText("");
+
+
                 songOneEdit.setText(songOneEdit.getText().toString());
                 songTwoEdit.setText(songTwoEdit.getText().toString());
                 songThreeEdit.setText(songThreeEdit.getText().toString());
@@ -264,71 +217,38 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         Log.d(TAG, "onConnectionFailed:" + connectionResult);
         Toast.makeText(this, "Google Play Services error.", Toast.LENGTH_SHORT).show();
     }
-//    public static void send(ChatMessage chatMessage) {
-//
-////
-////        sFirebaseDatabaseReference.child(MESSAGES_CHILD).push().setValue(chatMessage);
-//
-//
-//       /* DatabaseReference userRef = sFirebaseDatabaseReference.child(MESSAGES_CHILD);
-//        ValueEventListener eventListener = new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//                List<String> list = new ArrayList<>();
-//                for(DataSnapshot ds : dataSnapshot.getChildren()) {
-//                    //ds.child()
-//                    String userId = ds.getKey();
-//
-//                    list.add(userId);
-//
-//                }
-//                Log.d("BOO", list.toString());
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {}
-//        };
-//        userRef.addListenerForSingleValueEvent(eventListener);
-//*/
-//
-//
-//
-//
-//
-//
-//
-//        //Log.e("error",sFirebaseDatabaseReference.child(MESSAGES_CHILD).child("uid").toString());
-//        //Log.wtf("wtf",sFirebaseDatabaseReference.child(MESSAGES_CHILD).child("timestamp").toString());
-//    }
+
 
 
     public void addSong(Vote song) {
+        //Pushing songs onto the firebase database
         sFirebaseDatabaseReference.child(SONGS_CHILD).push().setValue(song);
 
-
+        //Creating a reference to the children nodes
         DatabaseReference songRef = sFirebaseDatabaseReference.child(SONGS_CHILD);
+        //Creating an event listener for grabbing updates
         ValueEventListener eventSongListener = new ValueEventListener() {
             @Override
+            //Creating our data snapshot to get current database when it changes
             public void onDataChange(DataSnapshot dataSnapshot) {
                 List<String> list = new ArrayList<>();
                 String key;
                 Integer count1,count2,count3;
                 for(DataSnapshot songSnap : dataSnapshot.getChildren()) {
                     key = songSnap.getKey();
+                    //Grabbing our current updated song counts
                     count1 = songSnap.child("song1count").getValue(Integer.class);
                     count2 = songSnap.child("song2count").getValue(Integer.class);
                     count3 = songSnap.child("song3count").getValue(Integer.class);
+                    //Setting the current updated vote counts
                     votecount1.setText(count1.toString());
                     votecount2.setText(count2.toString());
                     votecount3.setText(count3.toString());
-
+                    //Grabbing the user ID and adding it as a node
                     String userId = songSnap.getKey();
-
                     list.add(userId);
-
-
-
                 }
+                //Logcat debugging our list of songs
                 Log.d("SONGS", list.toString());
             }
 
@@ -339,12 +259,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     }
 
     public void next(){
-
-        //Remove data from database
+        //Clearing the database so that we refresh all of the
+        //properties of the program
         DatabaseReference root = FirebaseDatabase.getInstance().getReference();
         root.setValue(null);
         VoteActivity.refreshVote();
-
+        //Refreshing the song edit options
         songOneEdit.setEnabled(true);
         songTwoEdit.setEnabled(true);
         songThreeEdit.setEnabled(true);
